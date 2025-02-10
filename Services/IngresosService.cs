@@ -12,17 +12,17 @@ public class IngresosService(IDbContextFactory<Contexto> DbFactory)
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Ingresos.AnyAsync(c => c.IngresoId == id);
     }
-    private async Task<bool> Insertar(Ingresos cliente)
+    private async Task<bool> Insertar(Ingresos Ingreso)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
-        contexto.Ingresos.Add(cliente);
+        contexto.Ingresos.Add(Ingreso);
         return await contexto.SaveChangesAsync() > 0;
     }
     private async Task<bool> Modificar(Ingresos ingreso)
     {
         await using var _context = await DbFactory.CreateDbContextAsync();
         var local = _context.Ingresos.Local
-            .FirstOrDefault(c => c.IngresoId == ingreso.IngresoId);
+            .FirstOrDefault(i => i.IngresoId == ingreso.IngresoId);
         _context.Entry(ingreso).State = EntityState.Modified;
         return await _context.SaveChangesAsync() > 0;
     }
@@ -37,14 +37,14 @@ public class IngresosService(IDbContextFactory<Contexto> DbFactory)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         var Ingreso = await contexto.Ingresos
-            .Where(c => c.IngresoId == id).ExecuteDeleteAsync();
+            .Where(i => i.IngresoId == id).ExecuteDeleteAsync();
         return Ingreso > 0;
     }
     public async Task<Ingresos?> Buscar(int id)
     {
         await using var contexto = await DbFactory.CreateDbContextAsync();
         return await contexto.Ingresos.AsNoTracking().
-            FirstOrDefaultAsync(c => c.IngresoId == id);
+            FirstOrDefaultAsync(i => i.IngresoId == id);
     }
     public async Task<List<Ingresos>> Listar(Expression<Func<Ingresos, bool>> criterio)
     {
