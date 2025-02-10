@@ -1,0 +1,90 @@
+﻿@page "/Ingreso/Edit/{IngresoId:int}"
+@inject IngresosService ingresosService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+<PageTitle>Modificar</PageTitle>
+<EditForm Model="Ingreso" OnValidSubmit="Modificar">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Editar Ingreso</h5>
+            </div>
+
+            <div class="card-body">
+                @*Id*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>IngresoId</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Ingreso.IngresoId" READONLY></InputNumber>
+                </div>
+
+                @*Fecha*@
+                <div>
+                    <label class="form-label"><strong>Fecha</strong></label>
+                    <InputDate @bind-Value="Ingreso.Fecha" class="form-control"></InputDate>
+                    <ValidationMessage For="@(()=> Ingreso.Fecha)"></ValidationMessage>
+                </div>
+
+                @*Concepto*@
+                <div class="mb-3">
+                    <label class="form-label" for="Concepto"><strong>Concepto</strong></label>
+                    <InputText id="Concepto" class="form-control" @bind-Value="Ingreso.Concepto"></InputText>
+                    <ValidationMessage For="@(()=> Ingreso.Concepto)"></ValidationMessage>
+                </div>
+
+                @*Monto*@
+                <div class="mb-3">
+                    <label class="form-label" for="Monto"><strong>Monto</strong></label>
+                    <InputNumber id="Monto" class="form-control" @bind-Value="Ingreso.Monto"></InputNumber>
+                    <ValidationMessage For="@(()=> Ingreso.Monto)"></ValidationMessage>
+                </div>
+
+            </div>
+
+            @* footer *@
+            <div class="card-footer text-center mt-3">
+                <button type="submit" class="btn btn-outline-success ml-2"><span class="bi bi-check-circle-fill"></span> Guardar </button>
+                <a type="button" href="/Ingreso/Index/" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
+@code {
+    [Parameter]
+    public int IngresoId { get; set; }
+    public Ingresos Ingreso { get; set; } = new Ingresos();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IngresoId > 0)
+        {
+            Ingreso = await ingresosService.Buscar(IngresoId);
+        }
+    }
+
+    public Edit(ToastService toastService)
+    {
+        ToastService = toastService;
+    }
+
+    public async Task Modificar()
+    {
+        if (IngresoId > 0)
+        {
+            await ingresosService.Guardar(Ingreso);
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Ingreso editado correctamente."));
+            navigation.NavigateTo("/Ingreso/Index/");
+        }
+
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"No se pudo editar el Ingreso."));
+        }
+
+    }
+
+}
