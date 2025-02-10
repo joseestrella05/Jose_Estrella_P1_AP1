@@ -1,5 +1,86 @@
-﻿<h3>Create</h3>
+﻿@page "/Ingreso/Create"
+@inject IngresosService ingresosService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+<PageTitle>Create</PageTitle>
+<EditForm Model="Ingreso" OnValidSubmit="Crear">
+    <DataAnnotationsValidator />
+    <ValidationSummary />
+    <div class="container">
+        <div class="card shadow-lg">
+            <div class="card-header text-center">
+                <h5 class="card-title">Crear Ingreso</h5>
+            </div>
+
+            <div class="card-body">
+                @*Id*@
+                <div class="mb-3">
+                    <label class="form-label"><strong>IngresoId</strong></label>
+                    <InputNumber class="form-control" @bind-Value="Ingreso.IngresoId" READONLY></InputNumber>
+                </div>
+
+                @*Fecha*@
+                <div>
+                    <label class="form-label"><strong>Fecha</strong></label>
+                    <InputDate @bind-Value="Ingreso.Fecha" class="form-control"></InputDate>
+                    <ValidationMessage For="@(()=> Ingreso.Fecha)"></ValidationMessage>
+                </div>
+
+                @*Concepto*@
+                <div class="mb-3">
+                    <label class="form-label" for="Concepto"><strong>Concepto</strong></label>
+                    <InputText id="Concepto" class="form-control" @bind-Value="Ingreso.Concepto"></InputText>
+                    <ValidationMessage For="@(()=> Ingreso.Concepto)"></ValidationMessage>
+                </div>
+
+                @*Monto*@
+                <div class="mb-3">
+                    <label class="form-label" for="Monto"><strong>Monto</strong></label>
+                    <InputNumber id="Monto" class="form-control" @bind-Value="Ingreso.Monto"></InputNumber>
+                    <ValidationMessage For="@(()=> Ingreso.Monto)"></ValidationMessage>
+                </div>
+
+            </div>
+
+            @* footer *@
+            <div class="card-footer text-center mt-3">
+                <button type="button" class="btn btn-outline-primary ml-2" @onclick="Nuevo"><span class="bi bi-plus"></span> Nuevo </button>
+                <button type="submit" class="btn btn-outline-success ml-2"><span class="bi bi-check-circle-fill"></span> Guardar </button>
+                <a type="button" href="/Ingreso/Index/" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+            </div>
+        </div>
+    </div>
+</EditForm>
+
 
 @code {
+    public Ingresos Ingreso { get; set; } = new Ingresos();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    public Create(ToastService toastService)
+    {
+        ToastService = toastService;
+    }
+
+    public async Task Crear()
+    {
+        if (Ingreso.IngresoId == 0)
+        {
+            await ingresosService.Guardar(Ingreso);
+            ToastService.Notify(new(ToastType.Success, "Exito", $"Ingreso Creado correctamente."));
+            Ingreso = new Ingresos();
+            navigation.NavigateTo("/Ingreso/Index");
+        }
+        else
+        {
+            ToastService.Notify(new(ToastType.Danger, "Error", $"No se puedo Crear el Ingreso."));
+        }
+    }
+    public void Nuevo()
+    {
+        Ingreso = new Ingresos();
+    }
 
 }
+
