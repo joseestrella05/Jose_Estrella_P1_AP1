@@ -1,5 +1,120 @@
-﻿<h3>Index</h3>
+﻿@page "/Ingreso/Index"
+@rendermode InteractiveServer
+@inject IngresosService ingresoService
+@inject NavigationManager navigation
+
+<PageTitle>Ingreso</PageTitle>
+<div class="container">
+    <div class="card shadow-lg">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="card-title m-0">Registro Ingresos</h5>
+            <a href="/Ingreso/Create" class="btn btn-primary">
+                <span class="bi bi-plus-square"></span> Crear
+            </a>
+        </div>
+
+        <div class="card-body">
+
+            @*labels*@
+            <div class="row">
+
+                @*Filtrar por*@
+                <div class="col-3">
+                    <label class="col-form-label"><strong>Filtrar por</strong></label>
+                </div>
+
+                @*ValorFiltro*@
+                <div class="col-4">
+                    <label class="col-form-label"><strong>B&uacute;squeda</strong></label>
+                </div>
+            </div>
+
+            @*Inputs y botones*@
+            <div class="row align-items-center">
+                @*filtro*@
+                <div class="col-3">
+                    <InputSelect class="form-select" @bind-Value="filtro">
+                        <option value="" selected disabled>Elija una opci&oacute;n</option>
+                        <option value="Id">IngresoId</option>
+                        <option value="Concepto">Concepto</option>
+                        <option value="Monto">Monto</option>
+                    </InputSelect>
+                </div>
+
+                @*Busqueda*@
+                <div class="col-4">
+                    <div class="input-group">
+                        <input class="form-control" @bind="valorFiltro" placeholder="Buscar" />
+                        <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+
+            </div>
+
+            <table class="table table-hover table-bordered text-center">
+                <thead class="table  table-striped text-black">
+                    <tr>
+                        <th>Id</th>
+                        <th>Fecha</th>
+                        <th>Concepto</th>
+                        <th>Monto</th>
+                        <th>Modificar</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var ingreso in Ingreso)
+                    {
+                        <tr>
+                            <td>@ingreso.IngresoId</td>
+                            <td>@ingreso.Fecha</td>
+                            <td>@ingreso.Concepto</td>
+                            <td>@ingreso.Monto</td>
+                            <td class="text-center">
+                                <a href="/Ingreso/Edit/@ingreso.IngresoId" class="btn btn-outline-primary bi bi-pencil-square"></a>
+                            </td>
+                            <td class="text-center">
+                                <a href="/Ingreso/Delete/@ingreso.IngresoId" class="btn btn-outline-danger bi bi-trash"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
 
 @code {
+    public List<Ingresos> Ingreso = new List<Ingresos>();
+    private string filtro = "";
+    private string valorFiltro = "";
 
+    protected override async Task OnInitializedAsync()
+    {
+        Ingreso = await ingresoService.Listar(t => true);
+    }
+
+    private async Task Buscar()
+    {
+        if (!string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            if (filtro == "id" && int.TryParse(valorFiltro, out int IngresoId))
+            {
+                Ingreso = await ingresoService.Listar(s => s.IngresoId == IngresoId);
+            }
+            else if (filtro == "Concepto")
+            {
+                Ingreso = await ingresoService.Listar(s => s.Concepto.ToLower().Contains(valorFiltro.ToLower()));
+            }
+            else if (filtro == "Monto" && double.TryParse(valorFiltro, out double monto))
+            {
+                Ingreso = await ingresoService.Listar(s => s.Monto == monto);
+            }
+
+        }
+        else
+        {
+            Ingreso = await ingresoService.Listar(p => true);
+        }
+    }
 }

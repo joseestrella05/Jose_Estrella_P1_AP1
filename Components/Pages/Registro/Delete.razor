@@ -1,0 +1,72 @@
+﻿@page "/Ingreso/Delete/{IngresoId:int}"
+@inject IngresosService ingresosService
+@inject NavigationManager navigation
+@rendermode InteractiveServer
+
+<PageTitle>Eliminar</PageTitle>
+<EditForm Model="Ingreso" OnValidSubmit="Eliminar">
+    <DataAnnotationsValidator />
+    <div class="container">
+        <div class="card shadow-lg">
+            @*Header*@
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="card-title m-0">Eliminar Ingresos</h5>
+            </div>
+            @*Body*@
+            <div class="card-body">
+                <h7><strong>¿Est&aacute;s seguro de que quieres eliminar este Ingreso?</strong></h7>
+                <div class="mb-1">
+                    <p class="mb-0">IngresoId: @Ingreso.IngresoId</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Fecha: @Ingreso.Fecha </p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Concepto: @Ingreso.Concepto</p>
+                </div>
+                <div class="mb-1">
+                    <p class="mb-0">Monto: @Ingreso.Monto</p>
+                </div>
+            </div>
+            @*Footer*@
+            <div class="card-footer text-center mt-3">
+                <a type="button" href="/Ingreso/Index/" class="btn btn-outline-danger"><span class="bi bi-arrow-bar-left"></span> Volver </a>
+                <button type="button" class="btn btn-outline-danger ml-2" @onclick="Eliminar"><span class="bi bi-check-circle-fill"></span> Eliminar </button>
+            </div>
+        </div>
+    </div>
+
+</EditForm>
+
+
+@code {
+    [Parameter]
+    public int IngresoId { get; set; }
+    public Ingresos Ingreso { get; set; } = new Ingresos();
+    [Inject] protected ToastService ToastService { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (IngresoId > 0)
+        {
+            Ingreso = await ingresosService.Buscar(IngresoId);
+        }
+    }
+
+    public async Task Eliminar()
+    {
+        if (Ingreso != null)
+        {
+            var eliminar = await ingresosService.Eliminar(IngresoId);
+            if (eliminar)
+            {
+                ToastService.Notify(new(ToastType.Success, "Exito", $"Ingreso eliminado correctamente."));
+                navigation.NavigateTo("/Ingreso/Index/");
+            }
+            else
+            {
+                ToastService.Notify(new(ToastType.Success, "Exito", $"No se puedo eliminar el Ingreso."));
+            }
+        }
+    }
+}
