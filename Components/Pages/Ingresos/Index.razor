@@ -69,7 +69,7 @@
                             <td>@ingreso.IngresoId</td>
                             <td>@ingreso.Fecha</td>
                             <td>@ingreso.Concepto</td>
-                            <td>@ingreso.Monto</td>
+                            <td>@ingreso.Monto.ToString("N2")</td>
                             <td class="text-center">
                                 <a href="/Ingreso/Edit/@ingreso.IngresoId" class="btn btn-outline-primary bi bi-pencil-square"></a>
                             </td>
@@ -80,6 +80,10 @@
                     }
                 </tbody>
             </table>
+             <div class="card-footer space-between">
+                <label><strong>Cantidad: @Ingreso.Count()</strong></label>
+                <label><strong>Total: @Ingreso.Sum(i => i.Monto)</strong</label>
+             </div>
         </div>
     </div>
 </div>
