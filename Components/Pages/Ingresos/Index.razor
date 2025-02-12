@@ -47,9 +47,8 @@
                 <div class="col-3">
                     <InputSelect class="form-select" @bind-Value="filtro">
                         <option value="" selected disabled>Elija una opci&oacute;n</option>
-                        <option value="Id">IngresoId</option>
+                        <option value="id">IngresoId</option>
                         <option value="Concepto">Concepto</option>
-                        <option value="Monto">Monto</option>
                         <option value="Fecha">Fecha</option>
                     </InputSelect>
                 </div>
@@ -132,10 +131,6 @@
             else if (filtro == "Concepto")
             {
                 Ingreso = await ingresoService.Listar(i => i.Concepto.ToLower().Contains(valorFiltro.ToLower()));
-            }
-            else if (filtro == "Monto" && double.TryParse(valorFiltro, out double monto))
-            {
-                Ingreso = await ingresoService.Listar(i => i.Monto == monto);
             }
             else if (filtro == "Fecha")
             {
