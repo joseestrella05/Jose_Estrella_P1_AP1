@@ -27,6 +27,18 @@
                 <div class="col-4">
                     <label class="col-form-label"><strong>B&uacute;squeda</strong></label>
                 </div>
+
+                <div class="col-2">
+                    <label class="col-form-label"><strong>Desde</strong></label>
+                </div>
+                <div class="col-2">
+                    <label class="col-form-label"><strong>Hasta</strong></label>
+                </div>
+                <div class="col-1">
+                    <button type="button" class="btn btn-outline-secondary bi bi-arrow-counterclockwise"
+                    @onclick="Restablecer">
+                    </button>
+                </div>
             </div>
 
             @*Inputs y botones*@
@@ -38,6 +50,7 @@
                         <option value="Id">IngresoId</option>
                         <option value="Concepto">Concepto</option>
                         <option value="Monto">Monto</option>
+                        <option value="Fecha">Fecha</option>
                     </InputSelect>
                 </div>
 
@@ -46,6 +59,14 @@
                     <div class="input-group">
                         <input class="form-control" @bind="valorFiltro" placeholder="Buscar" />
                         <button type="button" class="btn btn-outline-primary bi bi-search" @onclick="Buscar"></button>
+                    </div>
+                </div>
+                <div class="col-2">
+                    <InputDate class="form-control" @bind-Value="Desde"></InputDate>
+                </div>
+                <div class="col-2">
+                    <div class="input-group">
+                        <InputDate class="form-control" @bind-Value="Hasta"></InputDate>
                     </div>
                 </div>
 
@@ -82,7 +103,7 @@
             </table>
              <div class="card-footer space-between">
                 <label><strong>Cantidad: @Ingreso.Count()</strong></label>
-                <label><strong>Total: @Ingreso.Sum(i => i.Monto)</strong</label>
+                <label><strong>Total: @Ingreso.Sum(i => i.Monto).ToString("N2")</strong</label>
              </div>
         </div>
     </div>
@@ -92,6 +113,8 @@
     public List<Ingresos> Ingreso = new List<Ingresos>();
     private string filtro = "";
     private string valorFiltro = "";
+    public DateTime? Desde { get; set; } = null;
+    public DateTime? Hasta { get; set; } = null;
 
     protected override async Task OnInitializedAsync()
     {
@@ -104,15 +127,20 @@
         {
             if (filtro == "id" && int.TryParse(valorFiltro, out int IngresoId))
             {
-                Ingreso = await ingresoService.Listar(s => s.IngresoId == IngresoId);
+                Ingreso = await ingresoService.Listar(i => i.IngresoId == IngresoId);
             }
             else if (filtro == "Concepto")
             {
-                Ingreso = await ingresoService.Listar(s => s.Concepto.ToLower().Contains(valorFiltro.ToLower()));
+                Ingreso = await ingresoService.Listar(i => i.Concepto.ToLower().Contains(valorFiltro.ToLower()));
             }
             else if (filtro == "Monto" && double.TryParse(valorFiltro, out double monto))
             {
-                Ingreso = await ingresoService.Listar(s => s.Monto == monto);
+                Ingreso = await ingresoService.Listar(i => i.Monto == monto);
+            }
+            else if (filtro == "Fecha")
+            {
+                Ingreso = await ingresoService
+                .Listar(i => i.Fecha >= Desde && i.Fecha <= Hasta); ;
             }
 
         }
@@ -120,5 +148,14 @@
         {
             Ingreso = await ingresoService.Listar(p => true);
         }
+    }
+
+    private async Task Restablecer()
+    {
+        Ingreso = await ingresoService.Listar(p => true);
+        filtro = "";
+        valorFiltro = "";
+        Desde = null;
+        Hasta = null;
     }
 }
