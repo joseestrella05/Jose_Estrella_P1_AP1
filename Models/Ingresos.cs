@@ -14,6 +14,6 @@ public class Ingresos
     public string? Concepto { get; set; }
 
     [Required(ErrorMessage = "Es obligatorio introducir un monto.")]
-    [Range(minimum: 0, maximum: double.MaxValue, ErrorMessage = "El monto debe ser mayor o igual a 0.")]
+    [Range(minimum: 1, maximum: double.MaxValue, ErrorMessage = "El monto debe ser mayor a 0.")]
     public double Monto { get; set; }
 }
